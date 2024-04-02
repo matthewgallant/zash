@@ -28,8 +28,8 @@ int main(int argc, char *argv[]) {
 
     // Create editor data
     Editor editor;
-    editor.curX = 1;
-    editor.curY = 1;
+    editor.curX = 0;
+    editor.curY = 0;
     editor.window = newwin(0, 0, 0, 0);
     memset(editor.buffer, 0, sizeof(int) * 1024 * 1024);
     
@@ -44,33 +44,45 @@ int main(int argc, char *argv[]) {
     while (!quit) {
         editor.key = getch();
 
-        if (editor.key == 27) {
-            // Save file and quit (esc)
-            save_to_file(&editor, argv[1]);
-            quit = TRUE;
-        } else if (editor.key == KEY_DC || editor.key == 127 || editor.key == '\b') {
-            // Only delete if not at edge of screen
-            if (editor.curX != 1) {
-                editor.curX--;
-                type_character(&editor, 32);
-                update_cursor(&editor);
-            }
-        } else if (editor.key == KEY_ENTER || editor.key == '\n') {
-            // Handle enter
-            editor.curX = 1;
-            move_down(&editor);
-        } else if (editor.key == KEY_UP) {
-            move_up(&editor);
-        } else if (editor.key == KEY_DOWN) {
-            move_down(&editor);
-        } else if (editor.key == KEY_LEFT) {
-            move_left(&editor);
-        } else if (editor.key == KEY_RIGHT) {
-            move_right(&editor);
-        } else if (editor.key >= 32 && editor.key <= 126) {
-            // Handle generic typing
-            type_character(&editor, editor.key);
-            editor.curX++;
+        switch (editor.key) {
+            case 27:
+                // Save file and quit (esc)
+                save_to_file(&editor, argv[1]);
+                quit = TRUE;
+                break;
+            case KEY_DC:
+            case 127:
+            case '\b':
+                // Only delete if not at edge of screen
+                if (editor.curX != 0) {
+                    editor.curX--;
+                    type_character(&editor, 32);
+                    update_cursor(&editor);
+                }
+                break;
+            case KEY_ENTER:
+            case '\n':
+                editor.curX = 0;
+                move_down(&editor);
+                break;
+            case KEY_UP:
+                move_up(&editor);
+                break;
+            case KEY_DOWN:
+                move_down(&editor);
+                break;
+            case KEY_LEFT:
+                move_left(&editor);
+                break;
+            case KEY_RIGHT:
+                move_right(&editor);
+                break;
+            default:
+                if (editor.key >= 32 && editor.key <= 126) {
+                    type_character(&editor, editor.key);
+                    editor.curX++;
+                }
+                break;
         }
 
         // Refresh the editor window

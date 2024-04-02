@@ -5,12 +5,12 @@
 #include "window.h"
 
 void update_cursor(Editor *editor) {
-    wmove(editor->window, editor->curY, editor->curX);
+    wmove(editor->window, editor->curY + 1, editor->curX + 1);
 }
 
 void type_character(Editor *editor, int character) {
-    mvwaddch(editor->window, editor->curY, editor->curX, (char)character);
-    editor->buffer[editor->curY - 1][editor->curX - 1] = character;
+    mvwaddch(editor->window, editor->curY + 1, editor->curX + 1, (char)character);
+    editor->buffer[editor->curY][editor->curX] = character;
 }
 
 void move_up(Editor *editor) {
