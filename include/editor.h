@@ -7,9 +7,8 @@
 #include <ncurses.h>
 
 typedef struct Editor {
-    int key;
-    int curX;
-    int curY;
+    int col, line;
+    int buffer[512][512];
+    char *filename;
     WINDOW *window;
-    int buffer[1024][1024];
 } Editor;

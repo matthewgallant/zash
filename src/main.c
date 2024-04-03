@@ -8,6 +8,7 @@
 
 #include "editor.h"
 #include "window.h"
+#include "commands.h"
 #include "save.h"
 
 int main(int argc, char *argv[]) {
@@ -17,10 +18,9 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    // Store quit state
-    bool quit = false;
-    int maxX;
-    int maxY;
+    // Store application state
+    bool quit = false, editorActive = true;
+    int maxX, maxY, key;
 
     // Initialize ncurses
     initscr();
@@ -31,67 +31,90 @@ int main(int argc, char *argv[]) {
 
     // Create editor data
     Editor editor;
-    editor.curX = 0;
-    editor.curY = 0;
-    editor.window = newwin(maxY - 1, 0, 0, 0);
-    memset(editor.buffer, 0, sizeof(int) * 1024 * 1024);
+    editor.col = 0, editor.line = 0;
+    memset(editor.buffer, 0, sizeof(int) * 512 * 512);
+    editor.filename = argv[1];
+    editor.window = newwin(maxY - 4, 0, 0, 0);
+
+    // Create commander data
+    Editor commander;
+    commander.col = 0, commander.line = 0;
+    memset(commander.buffer, 0, sizeof(int) * 512 * 512);
+    commander.window = newwin(3, 0, maxY - 4, 0);
     
-    // Draw editor window
+    // Refresh initial screen
     refresh();
-    box(editor.window, 0, 0);
-    mvwprintw(editor.window, 0, 1, "Editor");
+
+    // Create window titles
+    update_window_title(&editor, " Editor ");
+    update_window_title(&commander, " Commands (esc) ");
+
+    // Create about section
     mvwprintw(stdscr, maxY - 1, 0, "Zash");
-    mvwprintw(stdscr, maxY - 1, maxX - 24, "(c) 2024 Matthew Gallant");
+    mvwprintw(stdscr, maxY - 1, maxX - 19, "(c) Matthew Gallant");
+    
+    // Get cursor into initial position
     update_cursor(&editor);
-    wrefresh(editor.window);
+
+    // Store pointer to active editor
+    Editor *activeEditorPtr;
     
     // Main execution loop
     while (!quit) {
-        editor.key = getch();
+        key = getch();
 
-        switch (editor.key) {
+        // Update active editor pointer
+        if (editorActive) {
+            activeEditorPtr = &editor;
+        } else {
+            activeEditorPtr = &commander;
+        }
+
+        switch (key) {
             case 27:
-                // Save file and quit (esc)
-                save_to_file(&editor, argv[1]);
-                quit = TRUE;
+                switch_windows(&editor, &commander, &editorActive);
                 break;
             case KEY_DC:
             case 127:
             case '\b':
                 // Only delete if not at edge of screen
-                if (editor.curX != 0) {
-                    editor.curX--;
-                    type_character(&editor, 32);
-                    update_cursor(&editor);
+                if (activeEditorPtr->col != 0) {
+                    activeEditorPtr->col--;
+                    type_character(activeEditorPtr, 32);
+                    update_cursor(activeEditorPtr);
                 }
                 break;
             case KEY_ENTER:
             case '\n':
-                editor.curX = 0;
-                move_down(&editor);
+                if (editorActive) {
+                    editor.col = 0;
+                    move_down(&editor);
+                } else {
+                    if (process_command(&commander, &editor)) quit = true;
+                }
                 break;
             case KEY_UP:
-                move_up(&editor);
+                move_up(activeEditorPtr);
                 break;
             case KEY_DOWN:
-                move_down(&editor);
+                move_down(activeEditorPtr);
                 break;
             case KEY_LEFT:
-                move_left(&editor);
+                move_left(activeEditorPtr);
                 break;
             case KEY_RIGHT:
-                move_right(&editor);
+                move_right(activeEditorPtr);
                 break;
             default:
-                if (editor.key >= 32 && editor.key <= 126) {
-                    type_character(&editor, editor.key);
-                    editor.curX++;
+                if (key >= 32 && key <= 126) {
+                    type_character(activeEditorPtr, key);
+                    activeEditorPtr->col++;
                 }
                 break;
         }
 
-        // Refresh the editor window
-        wrefresh(editor.window);
+        // Refresh the current window
+        wrefresh(activeEditorPtr->window);
     }
 
     // Clean up before exit
