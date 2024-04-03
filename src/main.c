@@ -19,24 +19,29 @@ int main(int argc, char *argv[]) {
 
     // Store quit state
     bool quit = false;
+    int maxX;
+    int maxY;
 
     // Initialize ncurses
     initscr();
     noecho();
     nodelay(stdscr, true);
     keypad(stdscr, true);
+    getmaxyx(stdscr, maxY, maxX);
 
     // Create editor data
     Editor editor;
     editor.curX = 0;
     editor.curY = 0;
-    editor.window = newwin(0, 0, 0, 0);
+    editor.window = newwin(maxY - 1, 0, 0, 0);
     memset(editor.buffer, 0, sizeof(int) * 1024 * 1024);
     
     // Draw editor window
     refresh();
     box(editor.window, 0, 0);
     mvwprintw(editor.window, 0, 1, "Editor");
+    mvwprintw(stdscr, maxY - 1, 0, "Zash");
+    mvwprintw(stdscr, maxY - 1, maxX - 24, "(c) 2024 Matthew Gallant");
     update_cursor(&editor);
     wrefresh(editor.window);
     
