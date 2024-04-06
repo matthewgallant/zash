@@ -9,13 +9,13 @@
 
 bool process_command(Editor *commander, Editor *editor) {
     // Allocate memory for the C string
-    char command[512];
+    char command[commander->bufferSize];
 
     // Convert each integer to its corresponding ASCII character
-    for (int i = 0; i < 512; i++) {
+    for (int i = 0; i < commander->bufferSize; i++) {
         // Ignore spaces in command
-        if (commander->buffer[0][i] != 32) {
-            command[i] = (char)commander->buffer[0][i];
+        if (commander->buffer[i] != 32) {
+            command[i] = (char)commander->buffer[i];
         }
     }
 

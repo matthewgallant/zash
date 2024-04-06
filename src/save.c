@@ -7,27 +7,20 @@
 #include "save.h"
 
 void save_to_file(Editor *editor) {
-    char line[512];
+    char contents[editor->bufferSize];
 
     // Open file
     FILE *file;
     file = fopen(editor->filename, "w");
 
     // Loop through lines
-    for (int i = 0; i < 512; i++) {
-        // Loop through characters
-        for (int j = 0; j < 512; j++) {
-            // Add character to line
-            line[j] = (char)editor->buffer[i][j];
-        }
+    for (int i = 0; i < editor->bufferSize; i++) {
+        contents[i] = (char)editor->buffer[i];
+    }
 
-        // If line isn't blank, print to file
-        if (line[0] != '\0') {
-            fprintf(file, "%s\n", line);
-        }
-
-        // Reset line
-        memset(line, 0, sizeof(char) * 512);
+    // If line isn't blank, print to file
+    if (contents[0] != '\0') {
+        fprintf(file, "%s", contents);
     }
 
     // Close when done saving

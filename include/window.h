@@ -10,6 +10,10 @@ void update_cursor(Editor *editor);
 
 void type_character(Editor *editor, int character);
 
+void delete_character(Editor *editor);
+
+void new_line(Editor *editor);
+
 void move_up(Editor *editor);
 
 void move_down(Editor *editor);

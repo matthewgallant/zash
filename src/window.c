@@ -5,31 +5,74 @@
 #include "window.h"
 
 void update_cursor(Editor *editor) {
-    wmove(editor->window, editor->line + 1, editor->col + 1);
+    wmove(editor->window, editor->line, editor->col);
 }
 
 void type_character(Editor *editor, int character) {
-    mvwaddch(editor->window, editor->line + 1, editor->col + 1, (char)character);
-    editor->buffer[editor->line][editor->col] = character;
+    mvwaddch(editor->window, editor->line, editor->col, (char)character);
+    editor->buffer[editor->index] = character;
+    editor->col++;
+    editor->index++;
+}
+
+void delete_character(Editor *editor) {
+    // Only delete if not at edge of screen
+    if (editor->col > 1) {
+        editor->buffer[editor->index - 1] = 0;
+        editor->col--;
+        editor->index--;
+        
+        // TODO: Shift remaining chars in line down instead
+        mvwaddch(editor->window, editor->line, editor->col, 32);
+
+        update_cursor(editor);
+    }
+}
+
+void new_line(Editor *editor) {
+    // Insert new line char into buffer and update index
+    editor->buffer[editor->index] = 10;
+    editor->index++;
+
+    // Move cursor to next line
+    editor->col = 1;
+    move_down(editor);
 }
 
 void move_up(Editor *editor) {
-    editor->line--;
-    update_cursor(editor);
+    // TODO: move column to left if line below is shorter
+    // TODO: Update index accordingly
+    // Check if user can move further up
+    if (editor->line > 1) {
+        editor->line--;
+        update_cursor(editor);
+    }
 }
 
 void move_down(Editor *editor) {
+    // TODO: move column to left if line below is shorter
+    // TODO: Update index accordingly
+    // TODO: Check if user can move further down
     editor->line++;
     update_cursor(editor);
 }
 
 void move_left(Editor *editor) {
-    editor->col--;
-    update_cursor(editor);
+    // Check if user can move further left
+    if (editor->col > 1) {
+        editor->col--;
+        editor->index--;
+        update_cursor(editor);
+    }
 }
 
 void move_right(Editor *editor) {
-    update_cursor(editor);
+    // Check if user can move further right
+    if (editor->buffer[editor->index] != 0 && editor->buffer[editor->index] != 10) {
+        editor->col++;
+        editor->index++;
+        update_cursor(editor);
+    }
 }
 
 void update_window_title(Editor *editor, char *title) {
