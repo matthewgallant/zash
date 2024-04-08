@@ -14,16 +14,8 @@ make
 ## To Do
 
 - Implement dynamic text buffer
-- Properly handle backspaces (not insert a space)
-- Handle cursor positioning like normal text editor
-- Change window switching key (esc is too slow)
+- Load file contents if an existing file is supplied
+- Handle character deletions correctly
 - Add command status to about section
 - Scroll lines if window length exceeded
 - Scroll columns if window width exceeded
-- Load file contents if an existing file is supplied
-- Handle UTF-8 encoding
-
-## Down the Road
-
-- Syntax highlighting
-- Plugins

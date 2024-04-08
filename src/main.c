@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
 
     // Create window titles
     update_window_title(&editor, " Editor ");
-    update_window_title(&commander, " Commands (esc) ");
+    update_window_title(&commander, " Commands (F1) ");
     update_window_title(&debugger, " Debugger ");
 
     // Create about section
@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
 
             // Primary logic switch
             switch (key) {
-                case 27:
+                case KEY_F(1):
                     switch_windows(&editor, &commander, &editorActive);
                     break;
                 case KEY_DC:

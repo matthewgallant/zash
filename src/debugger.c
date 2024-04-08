@@ -27,11 +27,11 @@ void refresh_debugger(Editor *debugger, Editor *editor) {
     mvwprintw(debugger->window, 3, 1, buf);
 
     // Print buffer size
-    snprintf(buf, sizeof(buf), "%s%d", "buff size: ", editor->bufferSize);
+    snprintf(buf, sizeof(buf), "%s%d", "bufferSize: ", editor->bufferSize);
     mvwprintw(debugger->window, 4, 1, buf);
 
     // Print buffer
-    mvwprintw(debugger->window, 6, 1, "     BUFFER     ");
+    mvwprintw(debugger->window, 5, 1, "buffer:");
 
     attron(COLOR_PAIR(1));
 
@@ -39,7 +39,7 @@ void refresh_debugger(Editor *debugger, Editor *editor) {
     int *curCharPtr;
 
     // Loop through first 16 rows (256 chars)
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < 32; i++) {
         // Reset buffer
         memset(buf, 0, 16);
 
@@ -57,7 +57,7 @@ void refresh_debugger(Editor *debugger, Editor *editor) {
                     buf[j] = (char)*curCharPtr;
                 }
             } else {
-                buf[j] = (char)32;
+                buf[j] = '0';
             }
         }
 
@@ -65,7 +65,7 @@ void refresh_debugger(Editor *debugger, Editor *editor) {
         buf[16] = '\0';
 
         // Print 16 character buffer to window
-        mvwprintw(debugger->window, 7 + i, 1, buf);
+        mvwprintw(debugger->window, 6 + i, 1, buf);
     }
     
     wrefresh(debugger->window);

@@ -32,6 +32,7 @@ void delete_character(Editor *editor) {
 void new_line(Editor *editor) {
     // Insert new line char into buffer and update index
     editor->buffer[editor->index] = 10;
+    editor->line++;
     editor->index++;
 
     // Move cursor to next line
@@ -40,20 +41,66 @@ void new_line(Editor *editor) {
 }
 
 void move_up(Editor *editor) {
-    // TODO: move column to left if line below is shorter
-    // TODO: Update index accordingly
     // Check if user can move further up
     if (editor->line > 1) {
         editor->line--;
+
+        // Loop to top of previous line twice
+        for (int i = 0; i < 2; i++) {
+            while (editor->buffer[editor->index - 1] != 10 && editor->index > 1) editor->index--;
+            if (editor->index > 0) editor->index--;
+        }
+
+        // Account for the beginning of the buffer
+        if (editor->index == 0) {
+            editor->index--;
+        }
+
+        // Either reach column or new line char
+        for (int i = 0; i < editor->col; i++) {
+            editor->index++;
+            if (editor->buffer[editor->index] == 10) {
+                editor->col = i + 1;
+                break;
+            }
+        }
+        
         update_cursor(editor);
     }
 }
 
 void move_down(Editor *editor) {
-    // TODO: move column to left if line below is shorter
-    // TODO: Update index accordingly
-    // TODO: Check if user can move further down
-    editor->line++;
+    int prevIndex = editor->index;
+
+    // Loop to next line
+    while (editor->buffer[editor->index + 1] != 0 && editor->buffer[editor->index + 1] != 10) editor->index++;
+    editor->index++;
+
+    // Check we're not at the end of the file
+    if (editor->buffer[editor->index] != 0) {
+        editor->line++;
+
+        // Either reach column or new line char
+        for (int i = 1; i < editor->col; i++) {
+            editor->index++;
+
+            // End of line, move cursor here
+            if (editor->buffer[editor->index] == 10 || editor->buffer[editor->index] == 0) {
+                editor->col = i;
+                break;
+            }
+
+            // Partway through line, move cursor here
+            if (i + 1 == editor->col) {
+                editor->index++;
+                break;
+            }
+        }
+    } else {
+        // Reset index if we don't find a new line
+        editor->index = prevIndex;
+    }
+    
     update_cursor(editor);
 }
 
@@ -84,13 +131,13 @@ void update_window_title(Editor *editor, char *title) {
 void switch_windows(Editor *editor, Editor *commander, bool *editorActive) {
     if (*editorActive) {
         *editorActive = false;
-        update_window_title(editor, " Editor (esc) ");
+        update_window_title(editor, " Editor (F1) ");
         update_window_title(commander, " Commands ");
         update_cursor(commander);
     } else {
         *editorActive = true;
         update_window_title(editor, " Editor ");
-        update_window_title(commander, " Commands (esc) ");
+        update_window_title(commander, " Commands (F1) ");
         update_cursor(editor);
     }
 }
