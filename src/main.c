@@ -34,17 +34,17 @@ int main(int argc, char *argv[]) {
     Editor editor;
     initialize_editor(&editor, 512);
     editor.filename = argv[1];
-    editor.window = newwin(maxY - 4, maxX - 19, 0, 0);
+    editor.window = newwin(maxY - 4, maxX - 35, 0, 0);
 
     // Create commander data
     Editor commander;
     initialize_editor(&commander, 128);
-    commander.window = newwin(3, maxX - 19, maxY - 4, 0);
+    commander.window = newwin(3, maxX - 35, maxY - 4, 0);
 
     // Create debugger window
     Editor debugger;
     initialize_editor(&debugger, 256);
-    debugger.window = newwin(maxY - 1, 18, 0, maxX - 19);
+    debugger.window = newwin(maxY - 1, 34, 0, maxX - 35);
     
     // Refresh initial screen
     refresh();

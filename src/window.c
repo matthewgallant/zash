@@ -2,6 +2,8 @@
 // A wicked fast command-line text editor written in pure C.
 // (c) 2024 Matthew Gallant
 
+#include <stdlib.h>
+
 #include "window.h"
 
 void update_cursor(Editor *editor) {
@@ -9,8 +11,15 @@ void update_cursor(Editor *editor) {
 }
 
 void type_character(Editor *editor, int character) {
+    // TODO: Shift remaining chars in line up
     mvwaddch(editor->window, editor->line, editor->col, (char)character);
+    
+    // Update buffer size if needed and add char to it
+    increment_buffer(editor);
     editor->buffer[editor->index] = character;
+    editor->bufferLength++;
+    
+    // Update cursor properties
     editor->col++;
     editor->index++;
 }
@@ -18,20 +27,22 @@ void type_character(Editor *editor, int character) {
 void delete_character(Editor *editor) {
     // Only delete if not at edge of screen
     if (editor->col > 1) {
+        // TODO: Shift remaining chars in line down
         editor->buffer[editor->index - 1] = 0;
         editor->col--;
         editor->index--;
-        
-        // TODO: Shift remaining chars in line down instead
         mvwaddch(editor->window, editor->line, editor->col, 32);
-
         update_cursor(editor);
     }
 }
 
 void new_line(Editor *editor) {
-    // Insert new line char into buffer and update index
+    // Update buffer size and add new line char
+    increment_buffer(editor);
     editor->buffer[editor->index] = 10;
+    editor->bufferLength++;
+
+    // Update cursor properties
     editor->line++;
     editor->index++;
 

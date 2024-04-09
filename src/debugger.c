@@ -8,7 +8,7 @@
 #include "window.h"
 
 void refresh_debugger(Editor *debugger, Editor *editor) {
-    char buf[17]; // 16 chars + end of string char
+    char buf[33]; // 32 chars + end of string char
 
     // Clear and reset window
     werase(debugger->window);
@@ -30,23 +30,24 @@ void refresh_debugger(Editor *debugger, Editor *editor) {
     snprintf(buf, sizeof(buf), "%s%d", "bufferSize: ", editor->bufferSize);
     mvwprintw(debugger->window, 4, 1, buf);
 
-    // Print buffer
-    mvwprintw(debugger->window, 5, 1, "buffer:");
+    // Print buffer length
+    snprintf(buf, sizeof(buf), "%s%d", "bufferLength: ", editor->bufferLength);
+    mvwprintw(debugger->window, 5, 1, buf);
 
     attron(COLOR_PAIR(1));
 
     // Store pointer to current character
     int *curCharPtr;
 
-    // Loop through first 16 rows (256 chars)
-    for (int i = 0; i < 32; i++) {
+    // Loop through buffer size
+    for (int i = 0; i < editor->bufferSize / 32; i++) {
         // Reset buffer
-        memset(buf, 0, 16);
+        memset(buf, 0, 32);
 
         // Loop through cols
-        for (int j = 0; j < 16; j++) {
+        for (int j = 0; j < 32; j++) {
             // Set current character
-            curCharPtr = &editor->buffer[i * 16 + j];
+            curCharPtr = &editor->buffer[i * 32 + j];
 
             // Only print real characters
             if (*curCharPtr != 0) {
@@ -62,7 +63,7 @@ void refresh_debugger(Editor *debugger, Editor *editor) {
         }
 
         // Null-terminate string
-        buf[16] = '\0';
+        buf[32] = '\0';
 
         // Print 16 character buffer to window
         mvwprintw(debugger->window, 6 + i, 1, buf);

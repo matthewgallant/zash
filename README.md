@@ -16,6 +16,7 @@ make
 - Implement dynamic text buffer
 - Load file contents if an existing file is supplied
 - Handle character deletions correctly
-- Add command status to about section
+- Handle character insertions correctly
 - Scroll lines if window length exceeded
 - Scroll columns if window width exceeded
+- Add status area
