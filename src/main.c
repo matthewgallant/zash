@@ -9,6 +9,7 @@
 #include "editor.h"
 #include "window.h"
 #include "commands.h"
+#include "open.h"
 #include "save.h"
 #include "debugger.h"
 
@@ -57,7 +58,12 @@ int main(int argc, char *argv[]) {
     // Create about section
     mvwprintw(stdscr, maxY - 1, 0, "Zash");
     mvwprintw(stdscr, maxY - 1, maxX - 19, "(c) Matthew Gallant");
-    
+
+    // Read file if exists
+    if (editor.filename != NULL) {
+        open_file_to_editor(&editor);
+    }
+
     // Get cursor into initial position
     update_cursor(&editor);
     refresh_debugger(&debugger, &editor);
