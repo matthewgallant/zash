@@ -2,6 +2,8 @@
 
 A wicked fast command-line text editor written in pure C.
 
+![Screenshot](images/screenshot.png)
+
 ## Dependencies
 
 ### macOS
